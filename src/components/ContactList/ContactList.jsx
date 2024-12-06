@@ -6,25 +6,28 @@ import {
   selectContactsLoading,
   selectContactsError,
 } from "../../redux/contacts/slice";
+import { selectIsLoggedIn } from "../../redux/auth/selectors";
 import Contact from "../Contact/Contact";
 import css from "./ContactList.module.css";
 
 const ContactList = () => {
   const dispatch = useDispatch();
-
-  // Отримання контактів при монтуванні компонента
-  useEffect(() => {
-    dispatch(fetchContacts());
-  }, [dispatch]);
-
+  const isLoggedIn = useSelector(selectIsLoggedIn);
   const contacts = useSelector(selectFilteredContacts);
   const isLoading = useSelector(selectContactsLoading);
   const error = useSelector(selectContactsError);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchContacts());
+    }
+  }, [dispatch, isLoggedIn]);
 
   const handleDelete = (id) => {
     dispatch(deleteContact(id));
   };
 
+  if (!isLoggedIn) return null;
   if (isLoading) return <p>Loading contacts...</p>;
   if (error) return <p>Error: {error}</p>;
 
